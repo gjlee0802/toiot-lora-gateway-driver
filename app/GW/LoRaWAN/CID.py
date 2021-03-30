@@ -95,8 +95,9 @@ class CID:
             payload_size = 1
             payload+=[args['aid']]
             for action_value in args['values']:
+                print(action_value)
                 if payload_size>15:
-                    print('[WARNING] MacCommand payload size exceeded 15 Bytes...')
+                    print('[WARNING] MacCommand payload size exceed 15 Bytes...')
                 payload+=[action_value['value']]
                 payload+=[action_value['sleep']]
                 payload_size+=2

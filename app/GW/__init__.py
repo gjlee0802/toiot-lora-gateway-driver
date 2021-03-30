@@ -194,9 +194,12 @@ class LoRaWANrcv(LoRa):
                     self.commandType, self.AnsCommand_payload = CID.handle_command_payload(lorawan, self.devaddr2nodeid[self.rx_devaddr], lorawan.get_payload(), mqttclient)
             else:
                 # If not MacCommand, MQTT Publish
-                mqttclient.publish(rx_msg.split(':')[0], rx_msg.split(':')[1]) # topic: 'data/nodeid', message: 'sensorid,value'
-
-
+                
+                for sensor in rx_msg.split(':')[1].split(';'):
+                    if sensor.split(',')[0] == '5':
+                        mqttclient.publish(rx_msg.split(':')[0], sensor+',0.0') # topic: 'data/nodeid', message: 'sensorid,value'
+                    else:
+                        mqttclient.publish(rx_msg.split(':')[0], sensor)
 
             # If Unconfirmed Uplink, respond to MacCommand or just keep listen
             if lorawan.get_mhdr().get_mtype() == MHDR.UNCONF_DATA_UP:
@@ -269,7 +272,7 @@ class LoRaWANrcv(LoRa):
         self.reset_ptr_rx()
         self.set_mode(MODE.RXCONT)
         while True:
-            sleep(.2)
+            sleep(.3)
             # When not Receiving or Sending...
             if loramac.get_MacState() == LoRaMAC.LORAMAC_IDLE:
                 # If any nodeid received Req, send MacCommand (not ACK)
